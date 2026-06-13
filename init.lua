@@ -115,6 +115,9 @@ do
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
 
+  -- Scroll fewer lines per mouse/touchpad wheel tick for smoother scrolling
+  vim.o.mousescroll = 'ver:2,hor:6'
+
   -- Don't show the mode, since it's already in the status line
   vim.o.showmode = false
 
@@ -213,6 +216,23 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+  -- Toggle "copy mode": disable nvim mouse + hide gutters so the terminal's
+  -- native mouse selection copies clean text to the local clipboard (great over SSH).
+  vim.keymap.set('n', '<leader>tm', function()
+    if vim.o.mouse == '' then
+      vim.o.mouse = 'a'
+      vim.o.number = true
+      vim.o.signcolumn = 'yes'
+      vim.print 'Mouse ON (nvim controls mouse)'
+    else
+      vim.o.mouse = ''
+      vim.o.number = false
+      vim.o.relativenumber = false
+      vim.o.signcolumn = 'no'
+      vim.print 'Mouse OFF (terminal selection — drag to copy locally)'
+    end
+  end, { desc = '[T]oggle [M]ouse / copy mode' })
+
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
   -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -244,6 +264,14 @@ do
     desc = 'Highlight when yanking (copying) text',
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
+  })
+
+  -- Use ibeam cursor in all modes
+  vim.opt.guicursor = 'a:ver25'
+
+  -- Restore ibeam cursor when exiting Neovim
+  vim.api.nvim_create_autocmd('VimLeave', {
+    callback = function() vim.fn.chansend(vim.v.stderr, '\27[5 q') end,
   })
 end
 
@@ -975,3 +1003,6 @@ end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
+--
+
