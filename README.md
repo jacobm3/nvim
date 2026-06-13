@@ -13,7 +13,7 @@ launches Neovim (first launch installs all plugins at the pinned versions):
 
 ```bash
 # 1) System deps (we install Neovim itself separately below — apt's nvim is too old)
-sudo apt update && sudo apt install -y git curl ripgrep fd-find build-essential
+sudo apt update && sudo apt install -y git curl ripgrep fd-find build-essential tree-sitter-cli
 
 # 2) Neovim 0.12+ stable, from the official tarball (required for vim.pack)
 NVARCH=$(case "$(uname -m)" in x86_64) echo x86_64;; aarch64|arm64) echo arm64;; esac)
