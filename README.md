@@ -1,3 +1,44 @@
+# jacobm3's Neovim config
+
+My personal Neovim setup, based on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim).
+Plugin versions are pinned via the tracked `nvim-pack-lock.json`, so every machine
+gets an identical, reproducible setup.
+
+## Quick install (remote Linux box)
+
+Copy/paste this on any Debian/Ubuntu system. It installs prerequisites, backs up
+any existing config, clones this repo, and launches Neovim (first launch installs
+all plugins at the pinned versions):
+
+```bash
+sudo apt update && sudo apt install -y neovim git ripgrep fd-find build-essential && {
+  [ -e ~/.config/nvim ] && mv ~/.config/nvim ~/.config/nvim.bak.$(date +%s)
+  git clone https://github.com/jacobm3/nvim.git ~/.config/nvim && nvim
+}
+```
+
+Notes:
+
+- Requires **Neovim 0.12+** (this config uses `vim.pack`). If `apt` ships an older
+  version, install from the [official releases](https://github.com/neovim/neovim/releases)
+  instead.
+- Non-Debian distros: swap the `apt` line for your package manager
+  (`dnf install`, `pacman -S`, `brew install`, etc.). Package names: `neovim git
+  ripgrep fd-find build-essential`.
+- LSP servers/formatters install per-machine via `:Mason`. A Nerd Font is optional
+  (`have_nerd_font = false`), so glyphs degrade gracefully without one.
+- `<space>tm` toggles "copy mode" — releases the mouse and hides gutters so you can
+  drag-select straight to your local clipboard over SSH.
+
+## Updating
+
+```bash
+cd ~/.config/nvim && git pull          # pull my latest changes
+git fetch upstream && git merge upstream/master   # pull in upstream kickstart improvements
+```
+
+---
+
 # kickstart.nvim
 
 ## Introduction
