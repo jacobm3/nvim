@@ -6,25 +6,35 @@ gets an identical, reproducible setup.
 
 ## Quick install (remote Linux box)
 
-Copy/paste this on any Debian/Ubuntu system. It installs prerequisites, backs up
-any existing config, clones this repo, and launches Neovim (first launch installs
-all plugins at the pinned versions):
+Copy/paste this on any Debian/Ubuntu system. It installs prerequisites, installs
+Neovim 0.12+ from the official tarball (this config uses `vim.pack`, so the version
+in `apt` is **too old**), backs up any existing config, clones this repo, and
+launches Neovim (first launch installs all plugins at the pinned versions):
 
 ```bash
-sudo apt update && sudo apt install -y neovim git ripgrep fd-find build-essential && {
-  [ -e ~/.config/nvim ] && mv ~/.config/nvim ~/.config/nvim.bak.$(date +%s)
-  git clone https://github.com/jacobm3/nvim.git ~/.config/nvim && nvim
-}
+# 1) System deps (we install Neovim itself separately below — apt's nvim is too old)
+sudo apt update && sudo apt install -y git curl ripgrep fd-find build-essential
+
+# 2) Neovim 0.12+ stable, from the official tarball (required for vim.pack)
+NVARCH=$(case "$(uname -m)" in x86_64) echo x86_64;; aarch64|arm64) echo arm64;; esac)
+curl -fsSL "https://github.com/neovim/neovim/releases/download/stable/nvim-linux-${NVARCH}.tar.gz" | sudo tar -xz -C /opt
+sudo ln -sf "/opt/nvim-linux-${NVARCH}/bin/nvim" /usr/local/bin/nvim
+
+# 3) Clone this config and launch (first run installs plugins)
+[ -e ~/.config/nvim ] && mv ~/.config/nvim ~/.config/nvim.bak.$(date +%s)
+git clone https://github.com/jacobm3/nvim.git ~/.config/nvim && nvim
 ```
 
 Notes:
 
-- Requires **Neovim 0.12+** (this config uses `vim.pack`). If `apt` ships an older
-  version, install from the [official releases](https://github.com/neovim/neovim/releases)
-  instead.
-- Non-Debian distros: swap the `apt` line for your package manager
-  (`dnf install`, `pacman -S`, `brew install`, etc.). Package names: `neovim git
-  ripgrep fd-find build-essential`.
+- **Why not `apt install neovim`?** This config uses `vim.pack`, the built-in
+  plugin manager added in **Neovim 0.12**. Distro packages ship 0.9/0.10, which
+  fail with `Invalid 'event': 'PackChanged'`. The tarball above always gets stable.
+- Supports `x86_64` and `arm64`. For other distros, keep step 2 as-is and swap the
+  step-1 `apt` line for your package manager (`dnf install`, `pacman -S`, etc.);
+  package names: `git curl ripgrep fd-find base-devel`.
+- The tarball installs to `/opt/nvim-linux-<arch>` and symlinks into
+  `/usr/local/bin`, so it transparently overrides any older apt-installed `nvim`.
 - LSP servers/formatters install per-machine via `:Mason`. A Nerd Font is optional
   (`have_nerd_font = false`), so glyphs degrade gracefully without one.
 - `<space>tm` toggles "copy mode" — releases the mouse and hides gutters so you can
